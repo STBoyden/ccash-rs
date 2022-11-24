@@ -1,3 +1,5 @@
+***This is an old repository, as such the code here is not of great quality. You've been warned.***
+
 The Rust API for the online [CCash bank API](https://github.com/EntireTwix/CCash).
 
 The library is intended to be used in an asynchronous context.
