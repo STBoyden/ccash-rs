@@ -1,0 +1,38 @@
+[package]
+edition = "2021"
+name = "ccash-rs"
+version = "1.1.0"
+authors = ["STBoyden <sam@stboyden.com>"]
+description = "The Rust bindings for the CCash ledger API (CCash available here: https://github.com/EntireTwix/CCash)."
+homepage = "http://github.com/STBoyden/ccash-rs"
+documentation = "https://docs.rs/ccash-rs"
+keywords = ["minecraft", "webdev", "ccash", "api"]
+license = "MIT"
+repository = "http://github.com/STBoyden/ccash-rs"
+
+[dependencies.chrono]
+version = "0.4"
+
+[dependencies.reqwest]
+version = "0.11"
+features = ["json"]
+
+[dependencies.serde]
+version = "1"
+features = ["derive"]
+
+[dependencies.serde_json]
+version = "1"
+
+[dependencies.thiserror]
+version = "1.0.26"
+
+[dependencies.velcro]
+version = "0.5"
+
+[dev-dependencies.tokio]
+version = "1"
+features = ["full"]
+
+[features]
+interpret_endpoint_errors_as_false = []
