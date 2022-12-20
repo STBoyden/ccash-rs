@@ -1,5 +1,5 @@
 #![warn(missing_docs, clippy::pedantic)]
-#![allow(clippy::module_name_repetitions)]
+#![allow(clippy::module_name_repetitions, deprecated)]
 #![doc = include_str!("../README.md")]
 
 #[macro_use]
@@ -32,8 +32,9 @@ pub struct CCashSessionProperties {
 }
 
 /// Struct that describes the format of the logs returned by
-/// [`get_logs`](`methods::get_logs`).
+/// [`get_log`](`methods::get_log`).
 #[derive(Debug, Deserialize)]
+#[deprecated(since = "2.0.0", note = "Prefer the usage of `TransactionLogV2`")]
 pub struct TransactionLog {
     /// The account to which the funds were sent to.
     pub to: String,
@@ -47,13 +48,39 @@ pub struct TransactionLog {
 
 impl fmt::Display for TransactionLog {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let time = DateTime::<Utc>::from_utc(
+            NaiveDateTime::from_timestamp_opt(self.time, 0).unwrap(),
+            Utc,
+        );
         write!(
             f,
             "{}: {} ({} CSH) -> {}",
-            DateTime::<Utc>::from_utc(NaiveDateTime::from_timestamp(self.time, 0), Utc),
-            &self.from,
-            self.amount,
-            &self.to,
+            time, &self.from, self.amount, &self.to,
+        )
+    }
+}
+
+#[derive(Debug, Deserialize)]
+pub struct TransactionLogV2 {
+    pub counterparty: String,
+    pub receiving: bool,
+    pub amount: u32,
+    pub time: i64,
+}
+
+impl fmt::Display for TransactionLogV2 {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let action = if self.receiving { "Received" } else { "Sent" };
+        let tofrom = if self.receiving { "from" } else { "to" };
+        let time = DateTime::<Utc>::from_utc(
+            NaiveDateTime::from_timestamp_opt(self.time, 0).unwrap(),
+            Utc,
+        );
+
+        write!(
+            f,
+            "{time}: {action} {} CSH {tofrom} {}",
+            self.amount, self.counterparty
         )
     }
 }
