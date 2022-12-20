@@ -42,7 +42,7 @@ impl CCashSessionProperties {
         if let Some(b) = self.add_user_open {
             b
         } else {
-            false
+            true
         }
     }
 
