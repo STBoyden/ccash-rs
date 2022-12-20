@@ -39,11 +39,11 @@ impl CCashSessionProperties {
     /// pre-existing admin account
     #[must_use]
     pub fn get_add_user_is_open(&self) -> bool {
-        if let Some(b) = self.add_user_open {
-            b
-        } else {
-            true
-        }
+        let Some(b) = self.add_user_open else {
+           return true
+        };
+
+        b
     }
 
     /// Returns the account that funds are returned to when an account with
