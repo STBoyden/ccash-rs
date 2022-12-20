@@ -104,7 +104,6 @@ impl fmt::Display for TransactionLogV2 {
 /// (available [here](https://git.stboyden.com/STBoyden/ccash-rs/src/branch/master/examples/get_balance.rs)):
 /// ```
 #[doc = include_str!("../examples/get_balance.rs")]
-/// }
 /// ```
 /// 
 /// Before any function from [`methods`] and [`methods::admin`] is called,
@@ -155,7 +154,7 @@ impl CCashSession {
 
         if let Ok(v) = response.json::<CCashSessionProperties>().await {
             self.properties = Some(v.clone());
-            self.session_url = format!("{}/v{}", self.session_url, v.version);
+            self.session_url = format!("{}/", self.session_url);
 
             self.is_connected = true;
             self.client = Some(client);
