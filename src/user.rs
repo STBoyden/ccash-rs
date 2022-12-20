@@ -45,9 +45,9 @@ impl CCashUser {
     ///   `username` otherwise contains invalid characters such as spaces.
     pub fn new(username: &str, password: &str) -> Result<Self, CCashUsernameError> {
         let username = username.to_lowercase(); // usernames in `CCash` have to be lowercase. there's no point in iterating
-                                                // through all the characters and checking, then erroring if a uppercase
-                                                // character is found when an automatic conversion will
-                                                // suffice.
+        // through all the characters and checking, then erroring if a uppercase
+        // character is found when an automatic conversion will
+        // suffice.
 
         if username.len() < 3 {
             return Err(CCashUsernameError::NameTooShort);
