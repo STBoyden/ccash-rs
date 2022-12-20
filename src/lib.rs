@@ -19,18 +19,25 @@ use std::fmt;
 /// API.
 #[derive(Clone, Debug, Deserialize)]
 pub struct CCashSessionProperties {
-    pub(crate) version: u32,
+    pub(crate) version: Option<u32>,
     pub(crate) max_log: u32,
+    pub(crate) add_user_open: Option<bool>,
     pub(crate) return_on_del: Option<String>,
 }
 
 impl CCashSessionProperties {
     /// Returns the version of the `CCash` instance.
-    pub fn get_version(&self) -> u32 { self.version }
+    pub fn get_version(&self) -> Option<u32> { self.version }
 
     /// Returns the max amount of logs that can be returned by the `CCash`
     /// instance.
     pub fn get_max_log(&self) -> u32 { self.max_log }
+
+    /// Returns whether or not any user can register without the need of a
+    /// pre-existing admin account
+    pub fn get_add_user_is_open(&self) -> bool {
+        self.add_user_open.is_some() && self.add_user_open.unwrap()
+    }
 
     /// Returns the account that funds are returned to when an account with
     /// funds is deleted from the `CCash` instance. This field is optional
