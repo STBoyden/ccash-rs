@@ -26,7 +26,7 @@ pub struct CCashSessionProperties {
 
 impl CCashSessionProperties {
     /// Returns the version of the `CCash` instance.
-    pub fn get_version(&self) -> u32 { return self.version }
+    pub fn get_version(&self) -> u32 { self.version }
 
     /// Returns the max amount of logs that can be returned by the `CCash`
     /// instance.
