@@ -60,11 +60,17 @@ impl fmt::Display for TransactionLog {
     }
 }
 
+/// Struct that describes the format of the logs returned by
+/// [`get_log_v2`](`methods::get_log_v2`).
 #[derive(Debug, Deserialize)]
 pub struct TransactionLogV2 {
+    /// The name of the account where the funds were sent or received from.
     pub counterparty: String,
+    /// If the current [`CCashUser`] is sending or receiving funds.
     pub receiving: bool,
+    /// The amount of funds in CSH.
     pub amount: u32,
+    /// the time of the transaction in Unix epoch time.
     pub time: i64,
 }
 
