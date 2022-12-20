@@ -101,7 +101,7 @@ impl fmt::Display for TransactionLogV2 {
 /// can be connected to different `CCash` instances, if need be.
 ///
 /// An example usage is as follows
-/// (available [here](https://git.stboyden.com/STBoyden/ccash-rs/src/branch/master/examples/get_balance.rs)):
+/// (available [here](https://github.com/STBoyden/ccash-rs/src/branch/master/examples/get_balance.rs)):
 /// ```
 #[doc = include_str!("../examples/get_balance.rs")]
 /// ```
