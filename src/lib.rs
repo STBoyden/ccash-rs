@@ -27,16 +27,23 @@ pub struct CCashSessionProperties {
 
 impl CCashSessionProperties {
     /// Returns the version of the `CCash` instance.
+    #[must_use]
     pub fn get_version(&self) -> Option<u32> { self.version }
 
     /// Returns the max amount of logs that can be returned by the `CCash`
     /// instance.
+    #[must_use]
     pub fn get_max_log(&self) -> u32 { self.max_log }
 
     /// Returns whether or not any user can register without the need of a
     /// pre-existing admin account
+    #[must_use]
     pub fn get_add_user_is_open(&self) -> bool {
-        self.add_user_open.is_some() && self.add_user_open.unwrap()
+        if let Some(b) = self.add_user_open {
+            b
+        } else {
+            false
+        }
     }
 
     /// Returns the account that funds are returned to when an account with
@@ -44,6 +51,7 @@ impl CCashSessionProperties {
     /// as this is an option chosen by the host to include at compile-time,
     /// and may not always be present in the API properties returned by
     /// `CCash` on all instances.
+    #[must_use]
     pub fn get_return_on_delete_account(&self) -> &Option<String> { &self.return_on_del }
 }
 
@@ -60,15 +68,19 @@ pub struct TransactionLog {
 
 impl TransactionLog {
     /// Returns the account to which the funds were sent to.
+    #[must_use]
     pub fn get_to_account(&self) -> &str { &self.to }
 
     /// Returns the account from which the funds were sent from.
+    #[must_use]
     pub fn get_from_account(&self) -> &str { &self.from }
 
     /// Returns the amount of CSH that was sent.
+    #[must_use]
     pub fn get_amount(&self) -> u32 { self.amount }
 
     /// Returns the time that the funds were sent in Unix epoch time.
+    #[must_use]
     pub fn get_time(&self) -> i64 { self.time }
 }
 
@@ -99,16 +111,20 @@ pub struct TransactionLogV2 {
 impl TransactionLogV2 {
     /// Returns the name of the account where the funds were sent or received
     /// from.
+    #[must_use]
     pub fn get_counterparty(&self) -> &str { &self.counterparty }
 
     /// Returns if the current [`CCashUser`] is sending or receiving funds in
     /// this transaction.
+    #[must_use]
     pub fn get_if_receiving(&self) -> bool { self.receiving }
 
     /// Returns the amount of funds in CSH.
+    #[must_use]
     pub fn get_amount(&self) -> u32 { self.amount }
 
     /// Returns the time of the transaction in Unix epoch time.
+    #[must_use]
     pub fn get_time(&self) -> i64 { self.time }
 }
 
@@ -197,7 +213,7 @@ impl CCashSession {
         let response = client.execute(request).await?;
 
         if let Ok(v) = response.json::<CCashSessionProperties>().await {
-            self.properties = Some(v.clone());
+            self.properties = Some(v);
             self.is_connected = true;
             self.client = Some(client);
             Ok(())
