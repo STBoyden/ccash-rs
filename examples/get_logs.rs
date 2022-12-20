@@ -44,7 +44,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     session.establish_connection().await?;
 
     println!();
-    let logs = methods::get_logs(&session, &user).await.unwrap();
+    let logs = methods::get_log(&session, &user).await.unwrap();
 
     logs.iter()
         .enumerate()

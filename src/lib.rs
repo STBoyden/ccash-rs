@@ -1,5 +1,5 @@
 #![warn(missing_docs, clippy::pedantic)]
-#![allow(clippy::module_name_repetitions)]
+#![allow(clippy::module_name_repetitions, deprecated)]
 #![doc = include_str!("../README.md")]
 
 #[macro_use]
@@ -19,41 +19,105 @@ use std::fmt;
 /// API.
 #[derive(Clone, Debug, Deserialize)]
 pub struct CCashSessionProperties {
+    pub(crate) version: u32,
+    pub(crate) max_log: u32,
+    pub(crate) return_on_del: Option<String>,
+}
+
+impl CCashSessionProperties {
     /// Returns the version of the `CCash` instance.
-    pub version: u32,
-    /// The max amount of logs that can be returned by the `CCash` instance.
-    pub max_log: u32,
-    /// The account that funds are returned to when an account with funds is
-    /// deleted from the `CCash` instance. This field is optional as this is
-    /// an option chosen by the host to include at compile-time, and may not
-    /// always be present in the API properties returned by `CCash` on all
-    /// instances.
-    pub return_on_del: Option<String>,
+    pub fn get_version(&self) -> u32 { self.version }
+
+    /// Returns the max amount of logs that can be returned by the `CCash`
+    /// instance.
+    pub fn get_max_log(&self) -> u32 { self.max_log }
+
+    /// Returns the account that funds are returned to when an account with
+    /// funds is deleted from the `CCash` instance. This field is optional
+    /// as this is an option chosen by the host to include at compile-time,
+    /// and may not always be present in the API properties returned by
+    /// `CCash` on all instances.
+    pub fn get_return_on_delete_account(&self) -> &Option<String> { &self.return_on_del }
 }
 
 /// Struct that describes the format of the logs returned by
-/// [`get_logs`](`methods::get_logs`).
+/// [`get_log`](`methods::get_log`).
 #[derive(Debug, Deserialize)]
+#[deprecated(since = "2.0.0", note = "Prefer the usage of `TransactionLogV2`")]
 pub struct TransactionLog {
-    /// The account to which the funds were sent to.
-    pub to: String,
-    /// The account from which the funds were sent from.
-    pub from: String,
-    /// The amount of CSH that was sent.
-    pub amount: u32,
-    /// The time that the funds were sent in Unix epoch time.
-    pub time: i64,
+    pub(crate) to: String,
+    pub(crate) from: String,
+    pub(crate) amount: u32,
+    pub(crate) time: i64,
+}
+
+impl TransactionLog {
+    /// Returns the account to which the funds were sent to.
+    pub fn get_to_account(&self) -> &str { &self.to }
+
+    /// Returns the account from which the funds were sent from.
+    pub fn get_from_account(&self) -> &str { &self.from }
+
+    /// Returns the amount of CSH that was sent.
+    pub fn get_amount(&self) -> u32 { self.amount }
+
+    /// Returns the time that the funds were sent in Unix epoch time.
+    pub fn get_time(&self) -> i64 { self.time }
 }
 
 impl fmt::Display for TransactionLog {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let time = DateTime::<Utc>::from_utc(
+            NaiveDateTime::from_timestamp_opt(self.time, 0).unwrap(),
+            Utc,
+        );
         write!(
             f,
             "{}: {} ({} CSH) -> {}",
-            DateTime::<Utc>::from_utc(NaiveDateTime::from_timestamp(self.time, 0), Utc),
-            &self.from,
-            self.amount,
-            &self.to,
+            time, &self.from, self.amount, &self.to,
+        )
+    }
+}
+
+/// Struct that describes the format of the logs returned by
+/// [`get_log_v2`](`methods::get_log_v2`).
+#[derive(Debug, Deserialize)]
+pub struct TransactionLogV2 {
+    pub(crate) counterparty: String,
+    pub(crate) receiving: bool,
+    pub(crate) amount: u32,
+    pub(crate) time: i64,
+}
+
+impl TransactionLogV2 {
+    /// Returns the name of the account where the funds were sent or received
+    /// from.
+    pub fn get_counterparty(&self) -> &str { &self.counterparty }
+
+    /// Returns if the current [`CCashUser`] is sending or receiving funds in
+    /// this transaction.
+    pub fn get_if_receiving(&self) -> bool { self.receiving }
+
+    /// Returns the amount of funds in CSH.
+    pub fn get_amount(&self) -> u32 { self.amount }
+
+    /// Returns the time of the transaction in Unix epoch time.
+    pub fn get_time(&self) -> i64 { self.time }
+}
+
+impl fmt::Display for TransactionLogV2 {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let action = if self.receiving { "Received" } else { "Sent" };
+        let tofrom = if self.receiving { "from" } else { "to" };
+        let time = DateTime::<Utc>::from_utc(
+            NaiveDateTime::from_timestamp_opt(self.time, 0).unwrap(),
+            Utc,
+        );
+
+        write!(
+            f,
+            "{time}: {action} {} CSH {tofrom} {}",
+            self.amount, self.counterparty
         )
     }
 }
@@ -68,10 +132,9 @@ impl fmt::Display for TransactionLog {
 /// can be connected to different `CCash` instances, if need be.
 ///
 /// An example usage is as follows
-/// (available [here](https://git.stboyden.com/STBoyden/ccash-rs/src/branch/master/examples/get_balance.rs)):
+/// (available [here](https://github.com/STBoyden/ccash-rs/src/branch/master/examples/get_balance.rs)):
 /// ```
 #[doc = include_str!("../examples/get_balance.rs")]
-/// }
 /// ```
 /// 
 /// Before any function from [`methods`] and [`methods::admin`] is called,
@@ -92,7 +155,7 @@ impl CCashSession {
     #[must_use]
     pub fn new(base_url: &str) -> CCashSession {
         Self {
-            session_url: format!("{}/api", base_url),
+            session_url: format!("{base_url}/api"),
             is_connected: false,
             client: None,
             properties: None,
@@ -122,7 +185,7 @@ impl CCashSession {
 
         if let Ok(v) = response.json::<CCashSessionProperties>().await {
             self.properties = Some(v.clone());
-            self.session_url = format!("{}/v{}", self.session_url, v.version);
+            self.session_url = format!("{}/", self.session_url);
 
             self.is_connected = true;
             self.client = Some(client);

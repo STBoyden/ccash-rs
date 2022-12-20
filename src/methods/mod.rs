@@ -6,6 +6,7 @@ pub mod admin;
 
 use crate::{
     request::request, CCashError, CCashResponse, CCashSession, CCashUser, TransactionLog,
+    TransactionLogV2,
 };
 use reqwest::Method;
 use velcro::hash_map;
@@ -21,7 +22,7 @@ pub async fn get_balance(
     user: &CCashUser,
 ) -> Result<u32, CCashError> {
     let url = format!(
-        "{}/user/balance?name={}",
+        "{}/v1/user/balance?name={}",
         &session.session_url, &user.username
     );
 
@@ -40,14 +41,36 @@ pub async fn get_balance(
 ///
 /// Will return a `CCashError` if the request fails or if the data returned by
 /// `CCash` cannot be parsed into a valid `Vec<TransactionLog>`.
-pub async fn get_logs(
+#[deprecated(since = "2.0.0", note = "Please use `get_log_v2` where possible")]
+pub async fn get_log(
     session: &CCashSession,
     user: &CCashUser,
 ) -> Result<Vec<TransactionLog>, CCashError> {
-    let url = format!("{}/user/log", &session.session_url);
+    let url = format!("{}/v1/user/log", &session.session_url);
 
     let r = request::<()>(Method::GET, session, &url, Some(user), None).await?;
     if let Ok(v) = r.convert_message::<Vec<TransactionLog>>() {
+        Ok(v)
+    } else {
+        Err(r.into())
+    }
+}
+
+/// Returns the transaction logs for a given [`user`](CCashUser). This function
+/// requires a correct password.
+///
+/// # Errors
+///
+/// Will return a `CCashError` if the request fails or if the data returned by
+/// `CCash` cannot be parsed into a valid `Vec<`[`TransactionLogV2`]`>`.
+pub async fn get_log_v2(
+    session: &CCashSession,
+    user: &CCashUser,
+) -> Result<Vec<TransactionLogV2>, CCashError> {
+    let url = format!("{}/v2/user/log", &session.session_url);
+
+    let r = request::<()>(Method::GET, session, &url, Some(user), None).await?;
+    if let Ok(v) = r.convert_message::<Vec<TransactionLogV2>>() {
         Ok(v)
     } else {
         Err(r.into())
@@ -67,7 +90,7 @@ pub async fn contains_user(
     user: &CCashUser,
 ) -> Result<bool, CCashError> {
     let url = format!(
-        "{}/user/exists?name={}",
+        "{}/v1/user/exists?name={}",
         &session.session_url, &user.username
     );
 
@@ -95,7 +118,7 @@ pub async fn verify_password(
     session: &CCashSession,
     user: &CCashUser,
 ) -> Result<bool, CCashError> {
-    let url = format!("{}/user/verify_password", &session.session_url);
+    let url = format!("{}/v1/user/verify_password", &session.session_url);
 
     let r = request::<()>(Method::POST, session, &url, Some(user), None).await?;
     match r {
@@ -124,7 +147,7 @@ pub async fn change_password(
     user: &mut CCashUser,
     new_password: &str,
 ) -> Result<bool, CCashError> {
-    let url = format!("{}/user/change_password", &session.session_url);
+    let url = format!("{}/v1/user/change_password", &session.session_url);
     let body = hash_map! { "pass": new_password };
 
     let r = request(Method::PATCH, session, &url, Some(user), Some(&body)).await?;
@@ -160,7 +183,7 @@ pub async fn send_funds(
         amount: u32,
     }
 
-    let url = format!("{}/user/transfer", &session.session_url);
+    let url = format!("{}/v1/user/transfer", &session.session_url);
     let body = FundsTransfer {
         name: recipient_name.into(),
         amount,
@@ -192,7 +215,7 @@ pub async fn add_user(
     session: &CCashSession,
     user: &CCashUser,
 ) -> Result<bool, CCashError> {
-    let url = format!("{}/user/register", &session.session_url);
+    let url = format!("{}/v1/user/register", &session.session_url);
 
     let r = request(Method::POST, session, &url, None, Some(user)).await?;
     match r {
@@ -217,7 +240,7 @@ pub async fn delete_user(
     session: &CCashSession,
     user: &CCashUser,
 ) -> Result<(), CCashError> {
-    let url = format!("{}/user/delete", &session.session_url);
+    let url = format!("{}/v1/user/delete", &session.session_url);
 
     let r = request::<()>(Method::DELETE, session, &url, Some(user), None).await?;
     match r {
