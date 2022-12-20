@@ -20,7 +20,7 @@ pub async fn verify_account(
     session: &CCashSession,
     user: &CCashUser,
 ) -> Result<bool, CCashError> {
-    let url = format!("{}/admin/verify_account", &session.session_url);
+    let url = format!("{}/v1/admin/verify_account", &session.session_url);
 
     let r = request::<()>(Method::POST, session, &url, Some(user), None).await?;
     match r {
@@ -51,7 +51,7 @@ pub async fn change_password(
     user: &mut CCashUser,
     new_password: &str,
 ) -> Result<bool, CCashError> {
-    let url = format!("{}/admin/user/change_password", &session.session_url);
+    let url = format!("{}/v1/admin/user/change_password", &session.session_url);
 
     let new_user = CCashUser {
         username: user.username.clone(),
@@ -99,7 +99,7 @@ pub async fn set_balance(
         amount: u32,
     }
 
-    let url = format!("{}/admin/set_balance", &session.session_url);
+    let url = format!("{}/v1/admin/set_balance", &session.session_url);
 
     let body = SetBalanceData {
         name: username.into(),
@@ -133,7 +133,7 @@ pub async fn impact_balance(
         amount: i64,
     }
 
-    let url = format!("{}/admin/impact_balance", &session.session_url);
+    let url = format!("{}/v1/admin/impact_balance", &session.session_url);
 
     let body = ImpactBalanceData {
         name: username.into(),
@@ -169,7 +169,7 @@ pub async fn add_user(
         amount: u32,
     }
 
-    let url = format!("{}/admin/user/register", &session.session_url);
+    let url = format!("{}/v1/admin/user/register", &session.session_url);
 
     let body = AddUserData {
         user: new_user.clone(),
@@ -201,7 +201,7 @@ pub async fn delete_user(
     admin_user: &CCashUser,
     username: &str,
 ) -> Result<(), CCashError> {
-    let url = format!("{}/admin/user/delete", &session.session_url);
+    let url = format!("{}/v1/admin/user/delete", &session.session_url);
     let body = hash_map! { "name": username };
 
     let r = request(Method::DELETE, session, &url, Some(admin_user), Some(&body)).await?;
@@ -232,7 +232,7 @@ pub async fn prune_users(
         time: Option<i64>,
     }
 
-    let url = format!("{}/admin/prune_users", &session.session_url);
+    let url = format!("{}/v1/admin/prune_users", &session.session_url);
 
     let body = PruneUsersData { amount, time };
 
@@ -264,7 +264,7 @@ pub async fn close(
     session: &mut CCashSession,
     admin_user: &CCashUser,
 ) -> Result<(), CCashError> {
-    let url = format!("{}/admin/shutdown", &session.session_url);
+    let url = format!("{}/v1/admin/shutdown", &session.session_url);
 
     let r = request::<()>(Method::POST, session, &url, Some(admin_user), None).await?;
     match r {
