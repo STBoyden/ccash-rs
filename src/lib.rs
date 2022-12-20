@@ -119,7 +119,7 @@ impl CCashSession {
     #[must_use]
     pub fn new(base_url: &str) -> CCashSession {
         Self {
-            session_url: format!("{}/api", base_url),
+            session_url: format!("{base_url}/api"),
             is_connected: false,
             client: None,
             properties: None,
