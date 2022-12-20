@@ -161,6 +161,12 @@ impl CCashSession {
     /// Constructs a new `CCashSession` from a `base_url`
     #[must_use]
     pub fn new(base_url: &str) -> CCashSession {
+        let base_url = if base_url.ends_with('/') {
+            base_url.trim_end_matches('/')
+        } else {
+            base_url
+        };
+
         Self {
             session_url: format!("{base_url}/api"),
             is_connected: false,
@@ -192,8 +198,6 @@ impl CCashSession {
 
         if let Ok(v) = response.json::<CCashSessionProperties>().await {
             self.properties = Some(v.clone());
-            self.session_url = format!("{}/", self.session_url);
-
             self.is_connected = true;
             self.client = Some(client);
             Ok(())
