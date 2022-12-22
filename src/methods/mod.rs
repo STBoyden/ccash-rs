@@ -4,9 +4,10 @@
 
 pub mod admin;
 
+#[allow(unused_imports)]
 use crate::{
-    request::request, CCashError, CCashResponse, CCashSession, CCashUser, TransactionLog,
-    TransactionLogV2,
+    request::request, CCashError, CCashResponse, CCashSession, CCashUser, Result,
+    TransactionLog, TransactionLogV2,
 };
 use reqwest::Method;
 use velcro::hash_map;
@@ -17,10 +18,7 @@ use velcro::hash_map;
 ///
 /// Will return `CCashError` if the request fails or if the response from
 /// `CCash` cannot be parsed as a valid `u32`.
-pub async fn get_balance(
-    session: &CCashSession,
-    user: &CCashUser,
-) -> Result<u32, CCashError> {
+pub async fn get_balance(session: &CCashSession, user: &CCashUser) -> Result<u32> {
     let url = format!(
         "{}/v1/user/balance?name={}",
         &session.session_url, &user.username
@@ -45,7 +43,7 @@ pub async fn get_balance(
 pub async fn get_log(
     session: &CCashSession,
     user: &CCashUser,
-) -> Result<Vec<TransactionLog>, CCashError> {
+) -> Result<Vec<TransactionLog>> {
     let url = format!("{}/v1/user/log", &session.session_url);
 
     let r = request::<()>(Method::GET, session, &url, Some(user), None).await?;
@@ -66,7 +64,7 @@ pub async fn get_log(
 pub async fn get_log_v2(
     session: &CCashSession,
     user: &CCashUser,
-) -> Result<Vec<TransactionLogV2>, CCashError> {
+) -> Result<Vec<TransactionLogV2>> {
     let url = format!("{}/v2/user/log", &session.session_url);
 
     let r = request::<()>(Method::GET, session, &url, Some(user), None).await?;
@@ -85,10 +83,7 @@ pub async fn get_log_v2(
 /// Will return a `CCashError` if the request fails or if the `CCash` instance
 /// returns an error code as long as the error code isn't a 401 and as long as
 /// the `interpret_endpoint_errors_as_false` is disabled.
-pub async fn contains_user(
-    session: &CCashSession,
-    user: &CCashUser,
-) -> Result<bool, CCashError> {
+pub async fn contains_user(session: &CCashSession, user: &CCashUser) -> Result<bool> {
     let url = format!(
         "{}/v1/user/exists?name={}",
         &session.session_url, &user.username
@@ -114,10 +109,7 @@ pub async fn contains_user(
 /// Will return a `CCashError` if the request fails or if the `CCash` instance
 /// returns an error code when verifing the password as long as the
 /// `interpret_endpoint_errors_as_false` feature is disabled.
-pub async fn verify_password(
-    session: &CCashSession,
-    user: &CCashUser,
-) -> Result<bool, CCashError> {
+pub async fn verify_password(session: &CCashSession, user: &CCashUser) -> Result<bool> {
     let url = format!("{}/v1/user/verify_password", &session.session_url);
 
     let r = request::<()>(Method::POST, session, &url, Some(user), None).await?;
@@ -146,7 +138,7 @@ pub async fn change_password(
     session: &CCashSession,
     user: &mut CCashUser,
     new_password: &str,
-) -> Result<bool, CCashError> {
+) -> Result<bool> {
     let url = format!("{}/v1/user/change_password", &session.session_url);
     let body = hash_map! { "pass": new_password };
 
@@ -176,7 +168,7 @@ pub async fn send_funds(
     user: &CCashUser,
     recipient_name: &str,
     amount: u32,
-) -> Result<u32, CCashError> {
+) -> Result<u32> {
     #[derive(serde::Serialize)]
     struct FundsTransfer {
         name: String,
@@ -211,10 +203,7 @@ pub async fn send_funds(
 /// Will return `CCashError` if the instance returns an error response
 /// (other than a 409) *and* the feature `interpret_endpoint_errors_as_false` is
 /// disabled.
-pub async fn add_user(
-    session: &CCashSession,
-    user: &CCashUser,
-) -> Result<bool, CCashError> {
+pub async fn add_user(session: &CCashSession, user: &CCashUser) -> Result<bool> {
     let url = format!("{}/v1/user/register", &session.session_url);
 
     let r = request(Method::POST, session, &url, None, Some(user)).await?;
@@ -236,10 +225,7 @@ pub async fn add_user(
 /// # Errors
 ///
 /// Will return [`CCashError`] if request fails.
-pub async fn delete_user(
-    session: &CCashSession,
-    user: &CCashUser,
-) -> Result<(), CCashError> {
+pub async fn delete_user(session: &CCashSession, user: &CCashUser) -> Result<()> {
     let url = format!("{}/v1/user/delete", &session.session_url);
 
     let r = request::<()>(Method::DELETE, session, &url, Some(user), None).await?;

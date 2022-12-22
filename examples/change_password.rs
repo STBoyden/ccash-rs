@@ -4,7 +4,7 @@ use ccash_rs::*;
 use std::io::{self, prelude::*};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<()> {
     print!("Please enter the instance URL > ");
     io::stdout().flush().unwrap();
     let mut instance_url = String::new();
@@ -53,13 +53,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut session = CCashSession::new(&instance_url);
     session.establish_connection().await.expect("{}");
     // let old_password = user
-    if methods::change_password(&mut session, &mut user, &new_password)
+    if methods::change_password(&session, &mut user, &new_password)
         .await
         .unwrap_or_default()
     {
-        println!("Changed password to {}", new_password);
+        println!("Changed password to {new_password}");
     } else {
-        println!("Could not change password to {}", new_password);
+        println!("Could not change password to {new_password}");
     }
     Ok(())
 }

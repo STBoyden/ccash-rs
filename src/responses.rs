@@ -2,6 +2,7 @@
 //! responses when attempting to connect to `CCash` and error responses from
 //! `CCash`.
 
+use crate::CCashUsernameError;
 use reqwest::Response;
 use thiserror::Error;
 
@@ -47,7 +48,7 @@ impl CCashResponse {
 
     pub(crate) fn convert_message<'de, T: serde::Deserialize<'de> + Default>(
         &'de self,
-    ) -> Result<T, ()> {
+    ) -> std::result::Result<T, ()> {
         if let Self::Success { message, .. } = self {
             serde_json::from_str::<Option<T>>(message)
                 .unwrap_or_default()
@@ -62,6 +63,10 @@ impl CCashResponse {
 /// `CCash` instance.
 #[derive(Error, Debug)]
 pub enum CCashError {
+    /// An error that could be generated when interacting with usernames on
+    /// CCash.
+    #[error("An error occurred with a username: {0}")]
+    UsernameError(#[from] CCashUsernameError),
     /// A reqwest error.
     #[error("reqwest encontered an error: {0}")]
     ReqwestError(#[from] reqwest::Error),
@@ -90,3 +95,7 @@ pub enum CCashError {
 impl From<CCashResponse> for CCashError {
     fn from(r: CCashResponse) -> Self { CCashError::ErrorResponse(r) }
 }
+
+/// Convenience `Result` type for `ccash-rs` to deal with the relevant errors
+/// that can occur when using the bindings.
+pub type Result<T> = std::result::Result<T, CCashError>;

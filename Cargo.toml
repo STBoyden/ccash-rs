@@ -1,7 +1,7 @@
 [package]
 edition = "2021"
 name = "ccash-rs"
-version = "2.0.0-beta"
+version = "2.0.0-beta.1"
 authors = ["STBoyden <sam@stboyden.com>"]
 description = "The Rust bindings for the CCash ledger API (CCash available here: https://github.com/EntireTwix/CCash)."
 homepage = "http://github.com/STBoyden/ccash-rs"
@@ -23,4 +23,3 @@ tokio = { version = "1", features = ["full"] }
 
 [features]
 interpret_endpoint_errors_as_false = []
-

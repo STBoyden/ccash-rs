@@ -1,10 +1,10 @@
-#![allow(unused_assignments)]
+#![allow(unused_assignments, deprecated)]
 
 use ccash_rs::*;
 use std::io::{self, prelude::*};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<()> {
     print!("Please enter the instance URL > ");
     io::stdout().flush().unwrap();
     let mut instance_url = String::new();
@@ -48,7 +48,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     logs.iter()
         .enumerate()
-        .for_each(|(index, log)| println!("Log #{:0>3}:\t{} ({:?})", index, log, log));
+        .for_each(|(index, log)| println!("Log #{index:0>3}:\t{log} ({log:?})"));
 
     Ok(())
 }

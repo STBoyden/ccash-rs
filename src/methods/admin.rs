@@ -4,7 +4,9 @@
 //!
 //! [`methods`]: crate::methods
 
-use crate::{request::request, CCashError, CCashResponse, CCashSession, CCashUser};
+use crate::{
+    request::request, CCashError, CCashResponse, CCashSession, CCashUser, Result,
+};
 use reqwest::Method;
 use velcro::hash_map;
 
@@ -16,10 +18,7 @@ use velcro::hash_map;
 /// Will return a `CCashError` if the request fails or if the `CCash` instance
 /// returns an error code other than 401, as long as the
 /// `interpret_endpoint_errors_as_false` feature is disabled.
-pub async fn verify_account(
-    session: &CCashSession,
-    user: &CCashUser,
-) -> Result<bool, CCashError> {
+pub async fn verify_account(session: &CCashSession, user: &CCashUser) -> Result<bool> {
     let url = format!("{}/v1/admin/verify_account", &session.session_url);
 
     let r = request::<()>(Method::POST, session, &url, Some(user), None).await?;
@@ -45,12 +44,13 @@ pub async fn verify_account(
 /// Will return a `CCashError` if the request fails or if the `CCash` instance
 /// returns an error code as long as the `interpret_endpoint_errors_as_false`
 /// feature is disabled.
+#[allow(clippy::missing_panics_doc)]
 pub async fn change_password(
     session: &CCashSession,
     admin_user: &CCashUser,
     user: &mut CCashUser,
     new_password: &str,
-) -> Result<bool, CCashError> {
+) -> Result<bool> {
     let url = format!("{}/v1/admin/user/change_password", &session.session_url);
 
     let new_user = CCashUser::new(&user.username.clone(), new_password);
@@ -95,7 +95,7 @@ pub async fn set_balance(
     admin_user: &CCashUser,
     username: &str,
     new_balance: u32,
-) -> Result<(), CCashError> {
+) -> Result<()> {
     #[derive(serde::Serialize)]
     struct SetBalanceData {
         name: String,
@@ -129,7 +129,7 @@ pub async fn impact_balance(
     admin_user: &CCashUser,
     username: &str,
     amount: i64,
-) -> Result<(), CCashError> {
+) -> Result<()> {
     #[derive(serde::Serialize)]
     struct ImpactBalanceData {
         name: String,
@@ -164,7 +164,7 @@ pub async fn add_user(
     admin_user: &CCashUser,
     new_user: &CCashUser,
     amount: u32,
-) -> Result<bool, CCashError> {
+) -> Result<bool> {
     #[derive(serde::Serialize)]
     struct AddUserData {
         #[serde(flatten)]
@@ -203,7 +203,7 @@ pub async fn delete_user(
     session: &CCashSession,
     admin_user: &CCashUser,
     username: &str,
-) -> Result<(), CCashError> {
+) -> Result<()> {
     let url = format!("{}/v1/admin/user/delete", &session.session_url);
     let body = hash_map! { "name": username };
 
@@ -228,7 +228,7 @@ pub async fn prune_users(
     admin_user: &CCashUser,
     amount: u32,
     time: Option<i64>,
-) -> Result<u64, CCashError> {
+) -> Result<u64> {
     #[derive(serde::Serialize)]
     struct PruneUsersData {
         amount: u32,
@@ -263,10 +263,7 @@ pub async fn prune_users(
 /// Will return `CCashError` if the request fails (could be down to
 /// wrong/incorrect admin credientials) or if the `CCash` instance refuses to
 /// close for another reason.
-pub async fn close(
-    session: &mut CCashSession,
-    admin_user: &CCashUser,
-) -> Result<(), CCashError> {
+pub async fn close(session: &mut CCashSession, admin_user: &CCashUser) -> Result<()> {
     let url = format!("{}/v1/admin/shutdown", &session.session_url);
 
     let r = request::<()>(Method::POST, session, &url, Some(admin_user), None).await?;

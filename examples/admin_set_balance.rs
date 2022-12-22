@@ -4,7 +4,7 @@ use ccash_rs::*;
 use std::io::{self, prelude::*};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<()> {
     print!("Please enter the instance URL > ");
     io::stdout().flush().unwrap();
     let mut instance_url = String::new();
@@ -45,7 +45,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     name = name.trim().to_string();
     io::stdout().flush().unwrap();
 
-    print!("Please enter the new balance for {} > ", name);
+    print!("Please enter the new balance for {name} > ");
     io::stdout().flush().unwrap();
     let mut new_balance_str = String::new();
     match io::stdin().read_line(&mut new_balance_str) {
@@ -62,13 +62,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut session = CCashSession::new(&instance_url);
     session.establish_connection().await.expect("{}");
-    match methods::admin::set_balance(&mut session, &admin_user, &name, new_balance).await
-    {
-        Ok(_) => println!("Set balance for {} to {}", name, new_balance),
-        Err(e) => println!(
-            "Could not change balance to {} for {}: {}",
-            new_balance, name, e
-        ),
+    match methods::admin::set_balance(&session, &admin_user, &name, new_balance).await {
+        Ok(_) => println!("Set balance for {name} to {new_balance}"),
+        Err(e) => println!("Could not change balance to {new_balance} for {name}: {e}"),
     }
     Ok(())
 }

@@ -4,7 +4,7 @@ use ccash_rs::*;
 use std::io::{self, prelude::*};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<()> {
     print!("Please enter the instance URL > ");
     io::stdout().flush().unwrap();
     let mut instance_url = String::new();
@@ -45,10 +45,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     name = name.trim().to_string();
     io::stdout().flush().unwrap();
 
-    print!(
-        "Please enter how much to change the balance for {} (+/-)> ",
-        name
-    );
+    print!("Please enter how much to change the balance for {name} (+/-)> ");
     io::stdout().flush().unwrap();
     let mut balance_modifier_str = String::new();
     match io::stdin().read_line(&mut balance_modifier_str) {
@@ -69,19 +66,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut session = CCashSession::new(&instance_url);
     session.establish_connection().await.expect("{}");
-    match methods::admin::impact_balance(
-        &mut session,
-        &admin_user,
-        &name,
-        balance_modifier,
-    )
-    .await
+    match methods::admin::impact_balance(&session, &admin_user, &name, balance_modifier)
+        .await
     {
-        Ok(_) => println!("Impacted balance for {} by {}", name, balance_modifier),
-        Err(e) => println!(
-            "Could not impact balance by {} for {}: {}",
-            balance_modifier, name, e
-        ),
+        Ok(_) => println!("Impacted balance for {name} by {balance_modifier}"),
+        Err(e) =>
+            println!("Could not impact balance by {balance_modifier} for {name}: {e}"),
     }
     Ok(())
 }

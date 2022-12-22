@@ -4,7 +4,7 @@ use ccash_rs::*;
 use std::io::{self, prelude::*};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<()> {
     print!("Please enter the instance URL > ");
     io::stdout().flush().unwrap();
     let mut instance_url = String::new();
@@ -45,7 +45,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     name = name.trim().to_string();
     io::stdout().flush().unwrap();
 
-    print!("Please enter the new password for {} > ", name);
+    print!("Please enter the new password for {name} > ");
     io::stdout().flush().unwrap();
     let mut new_password = String::new();
     match io::stdin().read_line(&mut new_password) {
@@ -60,7 +60,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Err(error) => panic!("{}", error),
     };
 
-    let mut user = match CCashUser::new(&name, &"") {
+    let mut user = match CCashUser::new(&name, "") {
         Ok(user) => user,
         Err(error) => panic!("{}", error),
     };
@@ -68,18 +68,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut session = CCashSession::new(&instance_url);
     session.establish_connection().await.expect("{}");
     // let old_password = user
-    if methods::admin::change_password(
-        &mut session,
-        &admin_user,
-        &mut user,
-        &new_password,
-    )
-    .await
-    .unwrap_or_default()
+    if methods::admin::change_password(&session, &admin_user, &mut user, &new_password)
+        .await
+        .unwrap_or_default()
     {
-        println!("Changed password to {} for {}", new_password, name);
+        println!("Changed password to {new_password} for {name}");
     } else {
-        println!("Could not change password to {} for {}", new_password, name);
+        println!("Could not change password to {new_password} for {name}");
     }
     Ok(())
 }

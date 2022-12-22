@@ -4,7 +4,7 @@ use ccash_rs::*;
 use std::io::{self, prelude::*};
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> Result<()> {
     print!("Please enter the instance URL > ");
     io::stdout().flush().unwrap();
     let mut instance_url = String::new();
@@ -25,7 +25,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     name = name.trim().to_string();
     io::stdout().flush().unwrap();
 
-    let user = match CCashUser::new(&name, &"") {
+    let user = match CCashUser::new(&name, "") {
         Ok(user) => user,
         Err(error) => panic!("{}", error),
     };

@@ -198,7 +198,7 @@ impl CCashSession {
     ///
     /// Will return `CCashError::CouldNotParsePropertiesResponse` if the
     /// properties returned by `CCash` could not be parsed correctly.
-    pub async fn establish_connection(&mut self) -> Result<(), CCashError> {
+    pub async fn establish_connection(&mut self) -> Result<()> {
         if self.is_connected {
             return Ok(());
         }
