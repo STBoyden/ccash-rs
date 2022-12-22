@@ -53,10 +53,13 @@ pub async fn change_password(
 ) -> Result<bool, CCashError> {
     let url = format!("{}/v1/admin/user/change_password", &session.session_url);
 
-    let new_user = CCashUser {
-        username: user.username.clone(),
-        password: new_password.into(),
-    };
+    let new_user = CCashUser::new(&user.username.clone(), new_password);
+
+    if let Err(e) = new_user {
+        return Err(CCashError::from(e));
+    }
+
+    let new_user = new_user.unwrap();
 
     let r = request(
         Method::PATCH,
