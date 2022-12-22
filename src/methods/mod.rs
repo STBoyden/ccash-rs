@@ -16,7 +16,7 @@ use velcro::hash_map;
 ///
 /// # Errors
 ///
-/// Will return `CCashError` if the request fails or if the response from
+/// Will return [`CCashError`] if the request fails or if the response from
 /// `CCash` cannot be parsed as a valid `u32`.
 pub async fn get_balance(session: &CCashSession, user: &CCashUser) -> Result<u32> {
     let url = format!(
@@ -37,7 +37,7 @@ pub async fn get_balance(session: &CCashSession, user: &CCashUser) -> Result<u32
 ///
 /// # Errors
 ///
-/// Will return a `CCashError` if the request fails or if the data returned by
+/// Will return a [`CCashError`] if the request fails or if the data returned by
 /// `CCash` cannot be parsed into a valid `Vec<TransactionLog>`.
 #[deprecated(since = "2.0.0", note = "Please use `get_log_v2` where possible")]
 pub async fn get_log(
@@ -59,7 +59,7 @@ pub async fn get_log(
 ///
 /// # Errors
 ///
-/// Will return a `CCashError` if the request fails or if the data returned by
+/// Will return a [`CCashError`] if the request fails or if the data returned by
 /// `CCash` cannot be parsed into a valid `Vec<`[`TransactionLogV2`]`>`.
 pub async fn get_log_v2(
     session: &CCashSession,
@@ -80,7 +80,7 @@ pub async fn get_log_v2(
 ///
 /// # Errors
 ///
-/// Will return a `CCashError` if the request fails or if the `CCash` instance
+/// Will return a [`CCashError`] if the request fails or if the `CCash` instance
 /// returns an error code as long as the error code isn't a 401 and as long as
 /// the `interpret_endpoint_errors_as_false` is disabled.
 pub async fn contains_user(session: &CCashSession, user: &CCashUser) -> Result<bool> {
@@ -106,7 +106,7 @@ pub async fn contains_user(session: &CCashSession, user: &CCashUser) -> Result<b
 ///
 /// # Errors
 ///
-/// Will return a `CCashError` if the request fails or if the `CCash` instance
+/// Will return a [`CCashError`] if the request fails or if the `CCash` instance
 /// returns an error code when verifing the password as long as the
 /// `interpret_endpoint_errors_as_false` feature is disabled.
 pub async fn verify_password(session: &CCashSession, user: &CCashUser) -> Result<bool> {
@@ -131,7 +131,7 @@ pub async fn verify_password(session: &CCashSession, user: &CCashUser) -> Result
 ///
 /// # Errors
 ///
-/// Will return a `CCashError` if the request fails or if `CCash` instance
+/// Will return a [`CCashError`] if the request fails or if `CCash` instance
 /// returns an error code when changing the password for the `user`, as long as
 /// the `interpret_endpoint_errors_as_false` feature is disabled.
 pub async fn change_password(
@@ -161,7 +161,7 @@ pub async fn change_password(
 ///
 /// # Errors
 ///
-/// Will return a `CCashError` if the request fails or if the message returned
+/// Will return a [`CCashError`] if the request fails or if the message returned
 /// back by `CCash` cannot be parsed into a `u32`.
 pub async fn send_funds(
     session: &CCashSession,
@@ -200,7 +200,7 @@ pub async fn send_funds(
 ///
 /// # Errors
 ///
-/// Will return `CCashError` if the instance returns an error response
+/// Will return [`CCashError`] if the instance returns an error response
 /// (other than a 409) *and* the feature `interpret_endpoint_errors_as_false` is
 /// disabled.
 pub async fn add_user(session: &CCashSession, user: &CCashUser) -> Result<bool> {

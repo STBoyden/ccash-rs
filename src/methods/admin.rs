@@ -15,7 +15,7 @@ use velcro::hash_map;
 ///
 /// # Errors
 ///
-/// Will return a `CCashError` if the request fails or if the `CCash` instance
+/// Will return a [`CCashError`] if the request fails or if the `CCash` instance
 /// returns an error code other than 401, as long as the
 /// `interpret_endpoint_errors_as_false` feature is disabled.
 pub async fn verify_account(session: &CCashSession, user: &CCashUser) -> Result<bool> {
@@ -41,7 +41,7 @@ pub async fn verify_account(session: &CCashSession, user: &CCashUser) -> Result<
 ///
 /// # Errors
 ///
-/// Will return a `CCashError` if the request fails or if the `CCash` instance
+/// Will return a [`CCashError`] if the request fails or if the `CCash` instance
 /// returns an error code as long as the `interpret_endpoint_errors_as_false`
 /// feature is disabled.
 #[allow(clippy::missing_panics_doc)]
@@ -88,7 +88,7 @@ pub async fn change_password(
 ///
 /// # Errors
 ///
-/// Will return a `CCashError` if the request fails or if the `CCash` instance
+/// Will return a [`CCashError`] if the request fails or if the `CCash` instance
 /// returns an error code.
 pub async fn set_balance(
     session: &CCashSession,
@@ -122,7 +122,7 @@ pub async fn set_balance(
 ///
 /// # Errors
 ///
-/// Will return a `CCashError` if the request fails or if the `CCash` instance
+/// Will return a [`CCashError`] if the request fails or if the `CCash` instance
 /// returns an error code.
 pub async fn impact_balance(
     session: &CCashSession,
@@ -156,7 +156,7 @@ pub async fn impact_balance(
 ///
 /// # Errors
 ///
-/// Will return `CCashError` if the request fails or if the `CCash` instance
+/// Will return [`CCashError`] if the request fails or if the `CCash` instance
 /// returns an error code other than a 409 as long as the
 /// `interpret_endpoint_errors_as_false` feature is disabled.
 pub async fn add_user(
@@ -197,8 +197,8 @@ pub async fn add_user(
 ///
 /// # Errors
 ///
-/// Will return `CCashError` if request fails or if the `CCash` instance returns
-/// an error code.
+/// Will return [`CCashError`] if request fails or if the `CCash` instance
+/// returns an error code.
 pub async fn delete_user(
     session: &CCashSession,
     admin_user: &CCashUser,
@@ -220,7 +220,7 @@ pub async fn delete_user(
 ///
 /// # Errors
 ///
-/// Will return `CCashError` if the request fails (could be down to
+/// Will return [`CCashError`] if the request fails (could be down to
 /// wrong/incorrect admin credientials) or if the `CCash` instance refuses to
 /// prune it's users for another reason.
 pub async fn prune_users(
@@ -260,7 +260,7 @@ pub async fn prune_users(
 ///
 /// # Errors
 ///
-/// Will return `CCashError` if the request fails (could be down to
+/// Will return [`CCashError`] if the request fails (could be down to
 /// wrong/incorrect admin credientials) or if the `CCash` instance refuses to
 /// close for another reason.
 pub async fn close(session: &mut CCashSession, admin_user: &CCashUser) -> Result<()> {
